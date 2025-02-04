@@ -107,13 +107,14 @@ Example using Tailwind:
 
 ```css
 .my-style {
-   @apply w-full h-full;
+  @apply w-full h-full;
 }
 ```
 
 ### Data Structures
 
 **Article:**
+
 ```json
 {
   "publishedAt": "2024-06-05T03:29:00.248Z",
@@ -128,6 +129,7 @@ Example using Tailwind:
 ```
 
 **User:**
+
 ```json
 {
   "createdAt": "2024-06-04T14:44:52.367Z",
@@ -155,26 +157,31 @@ The REST API provides two main endpoints to fetch data: `/users` and `/articles`
 ### Example usage
 
 1. **Fetch All Users:**
+
    ```http
    GET /users
    ```
 
 2. **Fetch a Specific User by ID:**
+
    ```http
    GET /users/:id
    ```
 
 3. **Fetch Users with Search and Limit:**
+
    ```http
    GET /users?search=Matthew&limit=5
    ```
 
 4. **Fetch All Articles:**
+
    ```http
    GET /articles
    ```
 
 5. **Fetch a Specific Article by ID:**
+
    ```http
    GET /articles/:id
    ```
@@ -201,6 +208,7 @@ For more detailed information about filtering and querying, refer to the [MockAP
 You are building an address form system for an e-commerce platform. Instead of coding, we want you to explain your thought process about how you would solve this challenge.
 
 ## Overview
+
 Create a modular solution for a dynamic address form that adapts based on user input and country-specific requirements.
 
 > [!TIP]
@@ -209,6 +217,7 @@ Create a modular solution for a dynamic address form that adapts based on user i
 ## Requirements
 
 The form should:
+
 - Change its fields based on the selected country
 - Auto-complete city information when a postal code is entered
 - Validate data according to country-specific rules
@@ -218,17 +227,20 @@ The form should:
 Explain your solution focusing on these key aspects:
 
 ### 1. Component Structure
+
 - What "building blocks" or components would you need?
 - What would be the responsibility of each component?
 - How would you organize these components?
 
 ### 2. Component Communication
+
 - How would components share information?
 - What happens when a user changes the country?
 - How would the postal code component know about country changes?
 - How would the city field know when to auto-complete?
 
 ### 3. Problem Solving
+
 - What problems might users encounter?
 - How would you handle slow internet connections?
 - What happens if a user changes values rapidly?
@@ -237,6 +249,7 @@ Explain your solution focusing on these key aspects:
 ## Submission Format
 
 Choose ONE of these formats to explain your solution:
+
 1. Written explanation (max 1000 words)
 2. Short video (max 10 minutes)
 3. Audio explanation (max 10 minutes)
@@ -249,25 +262,28 @@ Your explanation should be clear and focused on HOW components work together rat
 "Here's how I would structure this solution:
 
 1. Main Form Controller
+
    - This would be the 'brain' of the form
    - Responsible for:
-     * Keeping track of all field values
-     * Deciding which fields to show/hide
-     * Coordinating between components
+     - Keeping track of all field values
+     - Deciding which fields to show/hide
+     - Coordinating between components
 
 2. Individual Field Components
+
    - Country Selector:
-     * Holds the list of available countries
-     * Triggers updates when country changes
+     - Holds the list of available countries
+     - Triggers updates when country changes
    - Postal Code Field:
-     * Adapts validation rules based on country
-     * Triggers city auto-complete
+     - Adapts validation rules based on country
+     - Triggers city auto-complete
    - City Field:
-     * Can be in regular or auto-complete mode
-     * Shows loading state when looking up data
+     - Can be in regular or auto-complete mode
+     - Shows loading state when looking up data
 
 3. Component Communication Flow
    When someone selects a new country:
+
    - Country field notifies form controller
    - Form controller updates postal code requirements
    - Postal code field adjusts its validation rules
@@ -305,8 +321,8 @@ We will evaluate your response based on:
 - How would you make your solution easy to maintain?
 - How would you handle form state when browser back button is used?
 
-
 ## Bonus Points
+
 - Consideration of accessibility
 - Thoughts on performance optimization
 - Ideas for testing your solution
