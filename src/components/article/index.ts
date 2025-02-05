@@ -11,12 +11,28 @@ class Article extends HTMLElement {
     this.render();
   }
 
+  toggleContent() {
+    const expandedContent = this.shadowRoot?.querySelector("#expandedContent");
+    const toggleBtn = this.shadowRoot?.querySelector(".toggleBtn");
+
+    this.expanded = !this.expanded;
+
+    if (this.expanded) {
+      expandedContent?.classList.remove("hidden");
+
+      if (toggleBtn) toggleBtn.textContent = "See Less";
+    } else {
+      expandedContent?.classList.add("hidden");
+
+      if (toggleBtn) toggleBtn.textContent = "See More";
+    }
+  }
+
   async render() {
     const title = this.getAttribute("article-title");
     const image = this.getAttribute("image");
     const company = this.getAttribute("company");
     const description = this.getAttribute("description");
-    const author = this.getAttribute("author-id");
 
     if (this?.shadowRoot) {
       this.shadowRoot.innerHTML = `
@@ -124,10 +140,10 @@ class Article extends HTMLElement {
             <h2>${title}</h2>
             <img src="${image}" alt="${title}">
             <div class="divider"></div>
-            <p><strong>Compañía:</strong> ${company}</p>
-
+            <p><strong>Company:</strong> ${company}</p>
+            <p><strong>Description:</strong> ${description}</p>
             <div id="expandedContent" class="hidden">
-                <p><strong>Description:</strong> ${description}</p>
+               
                 <p><strong>Author:</strong> <span id="author-name"></span></p>
                 <div class="author-details hidden">
                   <h3>Author Details</h3>
@@ -136,10 +152,14 @@ class Article extends HTMLElement {
               </div>
             </div>
             <div class="container-button-see-more">
-              <button class="toggleBtn">Ver más</button>
+              <button class="toggleBtn">See More</button>
             </div>
         </div>
     `;
+
+      this.shadowRoot
+        ?.querySelector(".toggleBtn")
+        ?.addEventListener("click", () => this.toggleContent());
     }
   }
 }
