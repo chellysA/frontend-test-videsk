@@ -1,10 +1,26 @@
+import usersServices from "../../services/users-services";
+
 class Article extends HTMLElement {
   expanded: boolean;
+  authorInfo: {
+    name: string;
+    avatar: string;
+    birthdate: string;
+    bio: string;
+  };
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+
+    // states
     this.expanded = false;
+    this.authorInfo = {
+      name: "",
+      avatar: "",
+      birthdate: "",
+      bio: "",
+    };
   }
 
   connectedCallback() {
@@ -28,11 +44,51 @@ class Article extends HTMLElement {
     }
   }
 
+  async getAuthorInfo(id?: string) {
+    if (!id) {
+      console.error("author-id attribute is required");
+      return;
+    }
+
+    try {
+      const author = await usersServices.getUserById(id);
+
+      this.authorInfo = {
+        name: author.name,
+        avatar: author.avatar,
+        birthdate: author.birthdate,
+        bio: author.bio,
+      };
+
+      const authorName = this.shadowRoot?.querySelector("#author-name");
+
+      if (authorName) authorName.innerHTML = this.authorInfo.name;
+    } catch (error) {
+      console.error("Error fetching author:", error);
+    }
+  }
+  showUserDetails() {
+    const authorDetails = this.shadowRoot?.querySelector(".author-details");
+    const authorBirthdate = this.shadowRoot?.querySelector("#author-birthdate");
+    const authorBio = this.shadowRoot?.querySelector("#author-bio");
+    const authorAvatar =
+      this.shadowRoot?.querySelector<HTMLImageElement>("#author-avatar");
+
+    if (authorDetails) authorDetails.classList.remove("hidden");
+    if (authorBirthdate)
+      authorBirthdate.innerHTML = new Date(
+        this.authorInfo.birthdate
+      ).toDateString();
+    if (authorBio) authorBio.innerHTML = this.authorInfo.bio;
+    if (authorAvatar) authorAvatar.src = this.authorInfo.avatar;
+  }
+
   async render() {
     const title = this.getAttribute("article-title");
     const image = this.getAttribute("image");
     const company = this.getAttribute("company");
     const description = this.getAttribute("description");
+    const author = this.getAttribute("author-id");
 
     if (this?.shadowRoot) {
       this.shadowRoot.innerHTML = `
@@ -121,6 +177,7 @@ class Article extends HTMLElement {
               
             #author-name {
               cursor: pointer;
+              color: var(--primary-color);
             }
 
             .author-details {
@@ -134,6 +191,22 @@ class Article extends HTMLElement {
                 color: var(--primary-color);
                 margin-top: 0;
             }
+
+            .author-details-header {
+              display: flex;
+              align-items: center;
+              gap: 16px
+            }
+
+            #author-avatar{
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+            }
+
+            h3{
+              margin:0px
+            }
         </style>
 
         <div class="card">
@@ -146,9 +219,12 @@ class Article extends HTMLElement {
                
                 <p><strong>Author:</strong> <span id="author-name"></span></p>
                 <div class="author-details hidden">
-                  <h3>Author Details</h3>
-                  <p><strong>Birthdate:</strong> <span id="authorBirthdate"></span></p>
-                  <p><strong>Bio:</strong> <span id="authorBio"></span></p>
+                  <div class="author-details-header">
+                    <img id="author-avatar" src="" alt="">
+                    <h3 >Author Details</h3>
+                  </div>
+                  <p><strong>Birthdate:</strong> <span id="author-birthdate"></span></p>
+                  <p><strong>Bio:</strong> <span id="author-bio"></span></p>
               </div>
             </div>
             <div class="container-button-see-more">
@@ -160,6 +236,14 @@ class Article extends HTMLElement {
       this.shadowRoot
         ?.querySelector(".toggleBtn")
         ?.addEventListener("click", () => this.toggleContent());
+
+      this.shadowRoot
+        ?.querySelector("#author-name")
+        ?.addEventListener("click", () => {
+          this.showUserDetails();
+        });
+
+      await this.getAuthorInfo(author || "");
     }
   }
 }
