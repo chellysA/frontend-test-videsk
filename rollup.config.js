@@ -6,13 +6,16 @@ import livereload from "rollup-plugin-livereload";
 import postcss from "rollup-plugin-postcss";
 import html from "rollup-plugin-html";
 import json from "@rollup/plugin-json";
+import typescript from "rollup-plugin-typescript2";
 
 import pkg from "./package.json";
 
 const production = !process.env.ROLLUP_WATCH;
 
 const banner = `/**
- * Copyright (C) ${new Date().getFullYear()} by ${pkg.author} - All Rights Reserved
+ * Copyright (C) ${new Date().getFullYear()} by ${
+  pkg.author
+} - All Rights Reserved
  * @name ${pkg.name}
  * @author Videsk
  * @license ${pkg.license}
@@ -39,7 +42,7 @@ function serve() {
         ["run", "start", "--", "--dev"],
         {
           shell: true,
-        },
+        }
       );
       process.on("SIGTERM", toExit);
       process.on("exit", toExit);
@@ -53,11 +56,12 @@ const defaultPlugins = [
   postcss({ inject: false }),
   resolve({ browser: true }),
   commonjs(),
+  typescript(),
 ];
 
 const configBuild = [
   {
-    input: "src/index.js",
+    input: "src/index.ts",
     output: [
       {
         file: "dist/component.js",
@@ -73,7 +77,7 @@ const configBuild = [
 
 const configDev = [
   {
-    input: "src/index.js",
+    input: "src/index.ts",
     output: [
       {
         file: "public/bundle.js",
