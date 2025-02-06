@@ -30,39 +30,32 @@ class Author extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
             <style>
-              p {
-                  color: var(--text-color);
-                  line-height: 1.6;
-                  margin: 8px 0;
-              }
-              .author-card {
-                display: flex;
-                flex-direction: column;
-                background-color: #f2f2f2;
-                border-radius: 8px;         
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                padding: 16px;
-                max-height: 250px;
-                overflow-y: auto;
-                scrollbar-width: thin; 
-                scrollbar-color:rgb(112, 184, 233) #f2f2f2; 
-              }   
-                
-              .author-card img {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                margin-bottom: 8px;
-              }
-                  
-              .author-card p {
-                margin: 4px 0;
-              }
-
-              #author-name {
-                font-weight: bold;
-                color: #3498db
-              }
+            p {
+                color: var(--text-color);
+                line-height: 1.6;
+                margin: 8px 0;
+            }
+                .author-card {
+                    display: flex;
+                    flex-direction: column;
+                    background-color: #f2f2f2;
+                    border-radius: 8px;         
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    padding: 16px;
+                }   
+                .author-card img {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    margin-bottom: 8px;
+                }
+                .author-card p {
+                    margin: 4px 0;
+                }
+                #author-name {
+                    font-weight: bold;
+                    color: #3498db
+                }
             </style>
             <div class="author-card">   
                 <div style="display: flex; gap: 16px; align-items: center">
