@@ -27,20 +27,20 @@ class Article extends HTMLElement {
     this.render();
   }
 
-  toggleContent() {
-    const expandedContent = this.shadowRoot?.querySelector("#expandedContent");
-    const toggleBtn = this.shadowRoot?.querySelector(".toggleBtn");
-
+  async toggleContent() {
+    const author = this.getAttribute("author-id");
+    const modal = this.shadowRoot?.querySelector("#modal");
     this.expanded = !this.expanded;
 
     if (this.expanded) {
-      expandedContent?.classList.remove("hidden");
+      if (!this.authorInfo.name) {
+        await this.getAuthorInfo(author || "");
+      }
 
-      if (toggleBtn) toggleBtn.textContent = "See Less";
+      modal?.classList.remove("hidden");
+      modal?.classList.add("modal");
     } else {
-      expandedContent?.classList.add("hidden");
-
-      if (toggleBtn) toggleBtn.textContent = "See More";
+      modal?.classList.toggle("hidden");
     }
   }
 
@@ -69,12 +69,22 @@ class Article extends HTMLElement {
   }
   showUserDetails() {
     const authorDetails = this.shadowRoot?.querySelector(".author-details");
+    const authorvisible = this.shadowRoot?.querySelector(".visible");
     const authorBirthdate = this.shadowRoot?.querySelector("#author-birthdate");
     const authorBio = this.shadowRoot?.querySelector("#author-bio");
     const authorAvatar =
       this.shadowRoot?.querySelector<HTMLImageElement>("#author-avatar");
 
-    if (authorDetails) authorDetails.classList.remove("hidden");
+    if (authorDetails && !authorvisible) {
+      authorDetails.classList.remove("hidden");
+      setTimeout(() => {
+        authorDetails.classList.add("visible");
+      }, 100);
+    }
+    if (authorvisible && authorDetails) {
+      authorDetails.classList.remove("visible");
+      authorDetails.classList.toggle("hidden");
+    }
     if (authorBirthdate)
       authorBirthdate.innerHTML = new Date(
         this.authorInfo.birthdate
@@ -88,7 +98,9 @@ class Article extends HTMLElement {
     const image = this.getAttribute("image");
     const company = this.getAttribute("company");
     const description = this.getAttribute("description");
-    const author = this.getAttribute("author-id");
+    const content = this.getAttribute("content");
+    const date = this.getAttribute("publishedAt") ?? "";
+    const publishedAt = new Date(date).toDateString();
 
     if (this?.shadowRoot) {
       this.shadowRoot.innerHTML = `
@@ -181,10 +193,19 @@ class Article extends HTMLElement {
             }
 
             .author-details {
-                background-color: var(--background-color);
-                border-radius: 8px;
-                padding: 16px;
-                margin-top: 16px;
+              background-color: var(--background-color);
+              border-radius: 8px;
+              padding: 16px;
+              margin-top: 16px;
+              opacity: 0; 
+              transform: translateY(-10px); 
+              transition: opacity 0.4s ease, transform 0.3s ease; 
+              visibility: hidden; 
+            }
+            .author-details.visible {
+              opacity: 1;
+              transform: translateY(0); 
+              visibility: visible;
             }
 
             .author-details h3 {
@@ -207,29 +228,105 @@ class Article extends HTMLElement {
             h3{
               margin:0px
             }
-        </style>
+            .description {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                -webkit-line-clamp: 3; 
+                height: 4.5em; 
+                line-height: 1.5em; 
+            }
 
+            .title {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                -webkit-line-clamp: 1; 
+                height: 1.5em; 
+                line-height: 1.5em; 
+            }
+
+            .title.expanded {
+                display: block;
+                height: auto;
+            }
+            .card-open first-block{}
+
+            .modal {
+            display: flex ;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            backdrop-filter: blur(8px);
+            background-color: rgba(0, 0, 0, 0.55);
+            justify-content: center;
+            align-items: center;
+            }
+
+            .modal-content {
+              display: flex;
+              background-color: white;
+              padding: 20px;
+              border-radius: 8px;
+              width: 80%;
+              max-height: 90vh;
+              position: relative;
+              gap: 20px
+            }
+
+            .close-button {
+              position: absolute;
+              top: 10px;
+              right: 15px;
+              font-size: 20px;
+              cursor: pointer;
+            }
+        </style>
+       
         <div class="card">
-            <h2>${title}</h2>
-            <img src="${image}" alt="${title}">
-            <div class="divider"></div>
-            <p><strong>Company:</strong> ${company}</p>
-            <p><strong>Description:</strong> ${description}</p>
-            <div id="expandedContent" class="hidden">
-               
-                <p><strong>Author:</strong> <span id="author-name"></span></p>
-                <div class="author-details hidden">
-                  <div class="author-details-header">
-                    <img id="author-avatar" src="" alt="">
-                    <h3 >Author Details</h3>
-                  </div>
-                  <p><strong>Birthdate:</strong> <span id="author-birthdate"></span></p>
-                  <p><strong>Bio:</strong> <span id="author-bio"></span></p>
+            <div>
+              <h2 id="title" class="title">${title}</h2>
+              <img src="${image}" alt="${title}">
+            </div>
+            <div>
+              <div class="divider"></div>
+              <p><strong>Company:</strong> ${company}</p>
+              <p id="description" class="description"><strong>Description:</strong> ${description}</p>
+              <div class="container-button-see-more">
+                <button class="toggleBtn">See More</button>
               </div>
             </div>
-            <div class="container-button-see-more">
-              <button class="toggleBtn">See More</button>
+        </div>
+        <div id="modal" class="hidden">
+          <div class="modal-content"> 
+           
+            <div style="width: 30%"> 
+              <span class="close-button">&times;</span>
+              <h2 class="modal-title">${title}</h2>
+              <img src="${image}" alt="${title}">
+              <p><strong>Company:</strong> ${company}</p>
+              <p class="description-modal" id="description-modal"><strong>Description:</strong> ${description}</p>
             </div>
+
+            <div style="width: 70%">
+              <p><strong>Content:</strong> ${content}</p>
+              <p><strong>Published at:</strong> ${publishedAt}</p>
+              <p><strong>Author:</strong> <span id="author-name"></span></p>
+
+              <div class="author-details hidden">
+                <div class="author-details-header">
+                  <img id="author-avatar" src="" alt="">
+                  <h3>Author Details</h3>
+                </div>
+                <p><strong>Birthdate:</strong> <span id="author-birthdate"></span></p>
+                <p><strong>Bio:</strong> <span id="author-bio"></span></p>
+              </div>
+            <div>
+          </div> 
         </div>
     `;
 
@@ -238,12 +335,21 @@ class Article extends HTMLElement {
         ?.addEventListener("click", () => this.toggleContent());
 
       this.shadowRoot
+        ?.querySelector(".close-button")
+        ?.addEventListener("click", () => {
+          const modal = this.shadowRoot?.querySelector("#modal");
+          modal?.classList.remove("modal");
+          modal?.classList.toggle("hidden");
+          this.expanded = false;
+          const toggleBtn = this.shadowRoot?.querySelector(".toggleBtn");
+          if (toggleBtn) toggleBtn.textContent = "See More"; // Restablecer el texto del botón
+        });
+
+      this.shadowRoot
         ?.querySelector("#author-name")
         ?.addEventListener("click", () => {
           this.showUserDetails();
         });
-
-      await this.getAuthorInfo(author || "");
     }
   }
 }
