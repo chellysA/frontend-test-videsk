@@ -1,5 +1,8 @@
 import articlesServices from "../../services/articles-services";
-
+import "../loader";
+const setLoading = (value: boolean) => {
+  document.querySelector("loader-component")?.setAttribute("open", `${value}`);
+};
 class ArticleList extends HTMLElement {
   articles: any[];
   params: any;
@@ -17,8 +20,8 @@ class ArticleList extends HTMLElement {
       order: "asc",
     };
   }
-
   async getArticles() {
+    setLoading(true);
     try {
       const response = await articlesServices.getArticles(this.params);
 
@@ -40,6 +43,9 @@ class ArticleList extends HTMLElement {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      console.log("entro");
+      setLoading(false);
     }
   }
   async connectedCallback() {
@@ -295,7 +301,6 @@ class ArticleList extends HTMLElement {
         this.params.search =
           (this.shadowRoot?.querySelector("#search-input") as HTMLInputElement)
             ?.value ?? "";
-        await this.getArticles();
       });
   }
 }
