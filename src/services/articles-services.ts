@@ -1,8 +1,24 @@
 import { env } from "../constants/env";
+import queryString from "query-string";
 
-const getArticles = async () => {
+interface IParams {
+  search?: string;
+  order?: string;
+}
+
+const getArticles = async (params: IParams = {}) => {
   try {
-    const response = await fetch(`${env.BASE_URL}/articles`);
+    const paramsString = queryString.stringify(
+      {
+        ...params,
+        orderby: "publishedAt",
+      },
+      {
+        skipEmptyString: true,
+      }
+    );
+
+    const response = await fetch(`${env.BASE_URL}/articles?${paramsString}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
