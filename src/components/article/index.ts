@@ -30,6 +30,7 @@ class Article extends HTMLElement {
   async toggleContent() {
     const author = this.getAttribute("author-id");
     const modal = this.shadowRoot?.querySelector("#modal");
+    const authorComponent = this.shadowRoot?.querySelector("#author-details");
     this.expanded = !this.expanded;
 
     if (this.expanded) {
@@ -68,29 +69,21 @@ class Article extends HTMLElement {
     }
   }
   showUserDetails() {
-    const authorDetails = this.shadowRoot?.querySelector(".author-details");
-    const authorvisible = this.shadowRoot?.querySelector(".visible");
-    const authorBirthdate = this.shadowRoot?.querySelector("#author-birthdate");
-    const authorBio = this.shadowRoot?.querySelector("#author-bio");
-    const authorAvatar =
-      this.shadowRoot?.querySelector<HTMLImageElement>("#author-avatar");
+    const authorDetails = this.shadowRoot?.querySelector("#author-details");
+    const authorvisible = authorDetails?.attributes.getNamedItem("name");
 
     if (authorDetails && !authorvisible) {
-      authorDetails.classList.remove("hidden");
-      setTimeout(() => {
-        authorDetails.classList.add("visible");
-      }, 100);
+      console.log(authorDetails);
+      authorDetails.setAttribute("name", this.authorInfo.name);
+      authorDetails.setAttribute("birthdate", this.authorInfo.birthdate);
+      authorDetails.setAttribute("bio", this.authorInfo.bio);
+      authorDetails.setAttribute("avatar", this.authorInfo.avatar);
+    } else {
+      authorDetails?.removeAttribute("name");
+      authorDetails?.removeAttribute("birthdate");
+      authorDetails?.removeAttribute("bio");
+      authorDetails?.removeAttribute("avatar");
     }
-    if (authorvisible && authorDetails) {
-      authorDetails.classList.remove("visible");
-      authorDetails.classList.toggle("hidden");
-    }
-    if (authorBirthdate)
-      authorBirthdate.innerHTML = new Date(
-        this.authorInfo.birthdate
-      ).toDateString();
-    if (authorBio) authorBio.innerHTML = this.authorInfo.bio;
-    if (authorAvatar) authorAvatar.src = this.authorInfo.avatar;
   }
 
   async render() {
@@ -170,9 +163,6 @@ class Article extends HTMLElement {
                 background-color: #27ae60;
             }
 
-            #expandedContent {
-            }
-
             .divider {
               border-top: 1px solid var(--background-color);
               margin: 16px 0px;
@@ -190,39 +180,6 @@ class Article extends HTMLElement {
             #author-name {
               cursor: pointer;
               color: var(--primary-color);
-            }
-
-            .author-details {
-              background-color: var(--background-color);
-              border-radius: 8px;
-              padding: 16px;
-              margin-top: 16px;
-              opacity: 0; 
-              transform: translateY(-10px); 
-              transition: opacity 0.4s ease, transform 0.3s ease; 
-              visibility: hidden; 
-            }
-            .author-details.visible {
-              opacity: 1;
-              transform: translateY(0); 
-              visibility: visible;
-            }
-
-            .author-details h3 {
-                color: var(--primary-color);
-                margin-top: 0;
-            }
-
-            .author-details-header {
-              display: flex;
-              align-items: center;
-              gap: 16px
-            }
-
-            #author-avatar{
-              width: 50px;
-              height: 50px;
-              border-radius: 50%;
             }
 
             h3{
@@ -245,12 +202,6 @@ class Article extends HTMLElement {
                 height: 1.5em; 
                 line-height: 1.5em; 
             }
-
-            .title.expanded {
-                display: block;
-                height: auto;
-            }
-            .card-open first-block{}
 
             .modal {
             display: flex ;
@@ -317,14 +268,7 @@ class Article extends HTMLElement {
               <p><strong>Published at:</strong> ${publishedAt}</p>
               <p><strong>Author:</strong> <span id="author-name"></span></p>
 
-              <div class="author-details hidden">
-                <div class="author-details-header">
-                  <img id="author-avatar" src="" alt="">
-                  <h3>Author Details</h3>
-                </div>
-                <p><strong>Birthdate:</strong> <span id="author-birthdate"></span></p>
-                <p><strong>Bio:</strong> <span id="author-bio"></span></p>
-              </div>
+              <author-component id="author-details"></author-component>
             <div>
           </div> 
         </div>
