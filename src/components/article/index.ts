@@ -236,6 +236,32 @@ class Article extends HTMLElement {
               font-size: 20px;
               cursor: pointer;
             }
+            
+            .modal-content-left {
+              width: 30%;
+            }
+
+            .modal-content-right {
+              width: 70%;
+            }
+
+            @media (max-width: 600px) {
+              .modal-content {
+                flex-direction: column;
+                max-height: min-content;
+                margin: 1rem 0;
+              }
+
+              .modal-content-left , .modal-content-right {
+                width: 100%;
+              }
+
+              .modal {
+                align-items: start;
+                 padding: 1rem 0;
+              }
+            }
+
         </style>
        
         <div class="card">
@@ -254,8 +280,8 @@ class Article extends HTMLElement {
         </div>
         <div id="modal" class="hidden">
           <div class="modal-content"> 
-           
-            <div style="width: 30%"> 
+
+            <div class="modal-content-left"> 
               <span class="close-button">&times;</span>
               <h2 class="modal-title">${title}</h2>
               <img src="${image}" alt="${title}">
@@ -263,7 +289,7 @@ class Article extends HTMLElement {
               <p class="description-modal" id="description-modal"><strong>Description:</strong> ${description}</p>
             </div>
 
-            <div style="width: 70%">
+            <div class="modal-content-right">
               <p><strong>Content:</strong> ${content}</p>
               <p><strong>Published at:</strong> ${publishedAt}</p>
               <p><strong>Author:</strong> <span id="author-name"></span></p>

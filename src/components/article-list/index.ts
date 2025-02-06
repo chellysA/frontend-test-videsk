@@ -207,6 +207,11 @@ class ArticleList extends HTMLElement {
           .sort-filter {
             justify-content: center;
           }
+
+          #top-bar {
+          flex-direction: column;
+          gap: 1rem;
+          }
         }
 
         #top-bar {
