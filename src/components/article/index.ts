@@ -1,4 +1,6 @@
 import usersServices from "../../services/users-services";
+import { setLoading } from "../../utils/setLoading";
+import "../loader";
 
 class Article extends HTMLElement {
   expanded: boolean;
@@ -50,7 +52,7 @@ class Article extends HTMLElement {
       console.error("author-id attribute is required");
       return;
     }
-
+    setLoading(true);
     try {
       const author = await usersServices.getUserById(id);
 
@@ -66,6 +68,8 @@ class Article extends HTMLElement {
       if (authorName) authorName.innerHTML = this.authorInfo.name;
     } catch (error) {
       console.error("Error fetching author:", error);
+    } finally {
+      setLoading(false);
     }
   }
   showUserDetails() {
