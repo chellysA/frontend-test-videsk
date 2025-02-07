@@ -1,8 +1,7 @@
 import articlesServices from "../../services/articles-services";
+import { setLoading } from "../../utils/setLoading";
 import "../loader";
-const setLoading = (value: boolean) => {
-  document.querySelector("loader-component")?.setAttribute("open", `${value}`);
-};
+
 class ArticleList extends HTMLElement {
   articles: any[];
   params: any;
@@ -44,7 +43,6 @@ class ArticleList extends HTMLElement {
     } catch (error) {
       console.error(error);
     } finally {
-      console.log("entro");
       setLoading(false);
     }
   }

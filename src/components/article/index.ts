@@ -1,8 +1,6 @@
 import usersServices from "../../services/users-services";
+import { setLoading } from "../../utils/setLoading";
 import "../loader";
-const setLoading = (value: boolean) => {
-  document.querySelector("loader-component")?.setAttribute("open", `${value}`);
-};
 
 class Article extends HTMLElement {
   expanded: boolean;
