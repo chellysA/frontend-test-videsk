@@ -1,10 +1,17 @@
 import articlesServices from "../../services/articles-services";
+import { articlesType } from "../../types";
 import { setLoading } from "../../utils/setLoading";
-import "../loader";
+
+import ToastComponent from "../toast";
 
 class ArticleList extends HTMLElement {
-  articles: any[];
-  params: any;
+  articles: articlesType[];
+  params: {
+    search: string;
+    order: string;
+    p: number;
+    limit: number;
+  };
 
   constructor() {
     super();
@@ -17,8 +24,11 @@ class ArticleList extends HTMLElement {
     this.params = {
       search: "",
       order: "asc",
+      p: 1,
+      limit: 10,
     };
   }
+
   async getArticles() {
     setLoading(true);
     try {
@@ -26,29 +36,30 @@ class ArticleList extends HTMLElement {
 
       this.articles = response;
 
-      if (this.params.search) {
-        this.articles = this.articles.filter(
-          (article) =>
-            article.title
-              .toLowerCase()
-              .includes(this.params.search.toLowerCase()) ||
-            article.company
-              .toLowerCase()
-              .includes(this.params.search.toLowerCase()) ||
-            article.description
-              .toLowerCase()
-              .includes(this.params.search.toLowerCase())
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
       setLoading(false);
+
+      return true;
+    } catch (error) {
+      this.toggleErrorMessage("Articles not found");
+      setLoading(false);
+
+      return false;
+    }
+  }
+
+  toggleErrorMessage(message: string) {
+    const errorMessageElement = document?.querySelector(
+      "toast-component"
+    ) as ToastComponent;
+
+    if (errorMessageElement?.show) {
+      errorMessageElement.show(message);
     }
   }
   async connectedCallback() {
-    await this.getArticles();
-    this.render();
+    const success = await this.getArticles();
+
+    if (success) this.render();
   }
 
   sortArticles(e: string) {
@@ -68,6 +79,22 @@ class ArticleList extends HTMLElement {
     }
   }
 
+  async changePage(newPage: number) {
+    if (newPage >= 1 && newPage) {
+      this.params.p = newPage;
+      const success = await this.getArticles();
+
+      if (success) {
+        this.render();
+
+        document.querySelector("html, body")?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+    }
+  }
+
   render() {
     if (!this.shadowRoot) return;
 
@@ -76,11 +103,12 @@ class ArticleList extends HTMLElement {
         .articles-list {
           display: flex;
           flex-wrap: wrap;
-          margin-top: 1rem;
+          justify-content: space-evenly;
+          margin: 1rem 2rem
         }
 
         .articles-list >   article-component {
-            margin: 1rem auto ;
+            padding: 1rem;
         }
 
         * {
@@ -134,7 +162,7 @@ class ArticleList extends HTMLElement {
         #search-btn {
          background-color:#2ecc71;
          border: none;
-         padding: 8px;
+         padding: 12px;
          border-radius: 20px;
          color: white;
          cursor: pointer;
@@ -197,7 +225,7 @@ class ArticleList extends HTMLElement {
           cursor: pointer;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
           .filters {
             flex-direction: column;
             align-items: stretch;
@@ -205,7 +233,6 @@ class ArticleList extends HTMLElement {
 
           .search-filter {
             margin-right: 0;
-            margin-bottom: 10px;
           }
 
           .sort-filter {
@@ -215,6 +242,11 @@ class ArticleList extends HTMLElement {
           #top-bar {
           flex-direction: column;
           gap: 1rem;
+          }
+
+          #search-btn {
+            max-width: 50%;
+            margin: auto;
           }
         }
 
@@ -228,11 +260,50 @@ class ArticleList extends HTMLElement {
         h1{
           margin: 0;
         }
+
+        .hidden {
+          display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+
+        .pagination button {
+          background-color: #3498db;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          margin: 0 5px;
+          cursor: pointer;
+          border-radius: 4px;
+          transition: background-color 0.3s;
+        }
+
+        .pagination button:disabled {
+          background-color: #bdc3c7;
+          cursor: not-allowed;
+        }
+
+        .pagination button:hover:not(:disabled) {
+          background-color: #2980b9;
+        }
+
+        .pagination span {
+          margin: 0 10px;
+        }
       </style>
-
-      <div id="top-bar">
+   
+      <div id="top-bar">  
           <h1 id="title">Videsk Articles</h1>
-
           <div class="filters">
             <div class="search-filter">
                 <input type="text" id="search-input" placeholder="Buscar productos..." value="${
@@ -266,12 +337,19 @@ class ArticleList extends HTMLElement {
             `
           )
           .join("")}
-
+           
       </div>
+       <div class="pagination">
+              <button id="prev-page" ${
+                this.params.p === 1 ? "disabled" : ""
+              }><</button>
+              <span>Page ${this.params.p}</span>
+              <button id="next-page">></button>
+            </div>
   
     `;
 
-    this.sortArticles(this.params.order);
+    this.sortArticles(this.params.order ?? "");
 
     this.shadowRoot
       .querySelector("#title")
@@ -291,11 +369,11 @@ class ArticleList extends HTMLElement {
     this.shadowRoot
       .querySelector("#search-btn")
       ?.addEventListener("click", async () => {
-        const searchValue =
-          (this.shadowRoot?.querySelector("#search-input") as HTMLInputElement)
-            ?.value ?? "";
-        await this.getArticles();
-        this.render();
+        this.params.p = 1;
+
+        const success = await this.getArticles();
+
+        if (success) this.render();
       });
 
     this.shadowRoot
@@ -305,6 +383,14 @@ class ArticleList extends HTMLElement {
           (this.shadowRoot?.querySelector("#search-input") as HTMLInputElement)
             ?.value ?? "";
       });
+
+    this.shadowRoot
+      .querySelector("#prev-page")
+      ?.addEventListener("click", () => this.changePage(this.params.p - 1));
+
+    this.shadowRoot
+      .querySelector("#next-page")
+      ?.addEventListener("click", () => this.changePage(this.params.p + 1));
   }
 }
 

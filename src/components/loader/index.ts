@@ -66,7 +66,6 @@ class Loader extends HTMLElement {
   hide() {
     this.removeAttribute("open");
     const loader = this.shadowRoot?.querySelector(".loader");
-    console.log("entro aqui");
     if (loader) loader.classList.remove("show");
   }
 
