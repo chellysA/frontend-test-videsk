@@ -32,7 +32,6 @@ class Article extends HTMLElement {
   async toggleContent() {
     const author = this.getAttribute("author-id");
     const modal = this.shadowRoot?.querySelector("#modal");
-    const authorComponent = this.shadowRoot?.querySelector("#author-details");
     this.expanded = !this.expanded;
 
     if (this.expanded) {
@@ -215,7 +214,6 @@ class Article extends HTMLElement {
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
             backdrop-filter: blur(8px);
             background-color: rgba(0, 0, 0, 0.55);
             justify-content: center;
@@ -249,21 +247,31 @@ class Article extends HTMLElement {
               width: 70%;
             }
 
-            @media (max-width: 600px) {
+            @media (max-width: 768px) {
               .modal-content {
                 flex-direction: column;
-                max-height: min-content;
-                margin: 1rem 0;
+                overflow-y: scroll;
+                max-height: 80vh;
               }
 
               .modal-content-left , .modal-content-right {
                 width: 100%;
               }
 
-              .modal {
-                align-items: start;
-                 padding: 1rem 0;
+              .modal-content::-webkit-scrollbar {
+                width: 8px; 
               }
+
+              .modal-content::-webkit-scrollbar-track {
+                background: #f1f1f1; 
+                border-radius: 10px;
+              }
+
+              .modal-content::-webkit-scrollbar-thumb {
+                background: var(--primary-color); 
+                border-radius: 10px;
+              }
+
             }
 
         </style>
@@ -297,9 +305,9 @@ class Article extends HTMLElement {
               <p><strong>Content:</strong> ${content}</p>
               <p><strong>Published at:</strong> ${publishedAt}</p>
               <p><strong>Author:</strong> <span id="author-name"></span></p>
-
               <author-component id="author-details"></author-component>
-            <div>
+            </div>
+            
           </div> 
         </div>
     `;
@@ -316,7 +324,7 @@ class Article extends HTMLElement {
           modal?.classList.toggle("hidden");
           this.expanded = false;
           const toggleBtn = this.shadowRoot?.querySelector(".toggleBtn");
-          if (toggleBtn) toggleBtn.textContent = "See More"; // Restablecer el texto del botón
+          if (toggleBtn) toggleBtn.textContent = "See More";
         });
 
       this.shadowRoot
