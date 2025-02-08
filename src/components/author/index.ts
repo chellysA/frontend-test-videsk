@@ -1,5 +1,3 @@
-import usersServices from "../../services/users-services";
-
 class Author extends HTMLElement {
   constructor() {
     super();
@@ -42,21 +40,47 @@ class Author extends HTMLElement {
                     border-radius: 8px;         
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                     padding: 16px;
+                    overflow-y: scroll;
+                    max-height: 200px;
                 }   
+
                 .author-card img {
                     width: 50px;
                     height: 50px;
                     border-radius: 50%;
                     margin-bottom: 8px;
                 }
+
                 .author-card p {
                     margin: 4px 0;
                 }
+
                 #author-name {
                     font-weight: bold;
                     color: #3498db
                 }
+
+                .author-card::-webkit-scrollbar {
+                  width: 8px; 
+                }
+
+                .author-card::-webkit-scrollbar-track {
+                  background: #f1f1f1; 
+                  border-radius: 10px;
+                }
+
+                .author-card::-webkit-scrollbar-thumb {
+                  background: var(--primary-color); 
+                  border-radius: 10px;
+                }
+                  
+                @media (min-width: 1440px) {
+                    .author-card {
+                        max-height: 100%;
+                    }
+                }
             </style>
+
             <div class="author-card">   
                 <div style="display: flex; gap: 16px; align-items: center">
                   <img src="${this.getAttribute("avatar")}" alt="">
